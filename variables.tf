@@ -85,3 +85,20 @@ variable "default_guest_type" {
   type        = string
   default     = "ubuntu-64"
 }
+
+# =============================================================================
+# Network Configuration Variables
+# =============================================================================
+
+variable "port_groups" {
+  description = "Map of port groups to create"
+  type = map(object({
+    name             = string
+    vswitch          = optional(string, "vSwitch0")
+    vlan             = optional(number, 0)
+    promiscuous_mode = optional(bool, false)
+    mac_changes      = optional(bool, false)
+    forged_transmits = optional(bool, false)
+  }))
+  default = {}
+}

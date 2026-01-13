@@ -16,6 +16,7 @@ This project uses the [josenk/esxi](https://registry.terraform.io/providers/jose
 - Add additional virtual disks
 - Cloud-init support for guest customization
 - Reusable VM module
+- **Network module** for managing vSwitches and port groups
 
 ## Prerequisites
 
@@ -81,20 +82,26 @@ This project uses the [josenk/esxi](https://registry.terraform.io/providers/jose
 ```
 terraform-esxi-vm/
 ├── main.tf                    # Main VM resources
+├── network.tf                 # Network configuration (optional)
 ├── variables.tf               # Input variables
 ├── outputs.tf                 # Output values
 ├── providers.tf               # Provider configuration
 ├── versions.tf                # Version constraints
 ├── terraform.tfvars.example   # Example variables file
 ├── modules/
-│   └── vm/                    # Reusable VM module
+│   ├── vm/                    # Reusable VM module
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── network/               # Network module (vSwitch/Port Groups)
 │       ├── main.tf
 │       ├── variables.tf
 │       └── outputs.tf
 └── examples/
     ├── single-vm/             # Single VM example
     ├── multiple-vms/          # Multiple VMs example
-    └── vm-from-ovf/           # OVF deployment example
+    ├── vm-from-ovf/           # OVF deployment example
+    └── network/               # Network configuration example
 ```
 
 ## Usage Examples
@@ -161,6 +168,55 @@ resource "esxi_guest" "from_template" {
 
   network_interfaces {
     virtual_network = "VM Network"
+  }
+}
+```
+
+### Network Module
+
+Create port groups on existing vSwitch:
+
+```hcl
+module "networks" {
+  source = "./modules/network"
+
+  create_vswitch = false
+
+  port_groups = {
+    "web-network" = {
+      name    = "Web-Network"
+      vswitch = "vSwitch0"
+      vlan    = 100
+    }
+    "db-network" = {
+      name    = "DB-Network"
+      vswitch = "vSwitch0"
+      vlan    = 200
+    }
+  }
+}
+```
+
+Create new vSwitch with port groups:
+
+```hcl
+module "isolated_network" {
+  source = "./modules/network"
+
+  create_vswitch = true
+  vswitch_name   = "vSwitch-Isolated"
+  vswitch_ports  = 128
+  vswitch_mtu    = 1500
+
+  uplinks = [
+    { name = "vmnic1" }
+  ]
+
+  port_groups = {
+    "isolated-mgmt" = {
+      name = "Isolated-Management"
+      vlan = 10
+    }
   }
 }
 ```
