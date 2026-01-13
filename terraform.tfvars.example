@@ -1,0 +1,101 @@
+# =============================================================================
+# ESXi Connection Configuration
+# =============================================================================
+# Copy this file to terraform.tfvars and update with your ESXi host details
+
+esxi_hostname = "192.168.1.100"
+esxi_hostport = 22
+esxi_hostssl  = "443"
+esxi_username = "root"
+esxi_password = "your-esxi-password"
+
+# =============================================================================
+# Virtual Machines Configuration
+# =============================================================================
+
+vms = {
+  # Example: Web Server
+  "web-server-01" = {
+    guest_name     = "web-server-01"
+    disk_store     = "datastore1"
+    memsize        = 4096
+    numvcpus       = 2
+    power          = "on"
+    guest_type     = "ubuntu-64"
+    boot_disk_size = 50
+    boot_disk_type = "thin"
+    notes          = "Web Server - Managed by Terraform"
+
+    network_interfaces = [
+      {
+        virtual_network = "VM Network"
+        nic_type        = "vmxnet3"
+      }
+    ]
+
+    additional_disks = []
+    guestinfo        = {}
+  }
+
+  # Example: Database Server
+  "db-server-01" = {
+    guest_name     = "db-server-01"
+    disk_store     = "datastore1"
+    memsize        = 8192
+    numvcpus       = 4
+    power          = "on"
+    guest_type     = "centos-64"
+    boot_disk_size = 100
+    boot_disk_type = "thin"
+    notes          = "Database Server - Managed by Terraform"
+
+    network_interfaces = [
+      {
+        virtual_network = "VM Network"
+        nic_type        = "vmxnet3"
+      }
+    ]
+
+    # Additional data disk
+    additional_disks = [
+      {
+        disk_store = "datastore1"
+        size       = 200
+        disk_type  = "thin"
+      }
+    ]
+
+    guestinfo = {}
+  }
+
+  # Example: Windows Server
+  "win-server-01" = {
+    guest_name     = "win-server-01"
+    disk_store     = "datastore1"
+    memsize        = 8192
+    numvcpus       = 4
+    power          = "on"
+    guest_type     = "windows9Server64Guest"
+    boot_disk_size = 80
+    boot_disk_type = "thin"
+    notes          = "Windows Server - Managed by Terraform"
+
+    network_interfaces = [
+      {
+        virtual_network = "VM Network"
+        nic_type        = "e1000e"
+      }
+    ]
+
+    additional_disks = []
+    guestinfo        = {}
+  }
+}
+
+# =============================================================================
+# Default Values
+# =============================================================================
+
+default_datastore  = "datastore1"
+default_network    = "VM Network"
+default_guest_type = "ubuntu-64"
