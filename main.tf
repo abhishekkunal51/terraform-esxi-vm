@@ -45,15 +45,6 @@ resource "esxi_guest" "vms" {
       slot            = "0:${virtual_disks.key + 1}"
     }
   }
-
-  # Guest info for cloud-init or other customization
-  dynamic "guestinfo" {
-    for_each = each.value.guestinfo
-    content {
-      key   = guestinfo.key
-      value = guestinfo.value
-    }
-  }
 }
 
 # =============================================================================

@@ -3,7 +3,7 @@
 # =============================================================================
 # Copy this file to terraform.tfvars and update with your ESXi host details
 
-esxi_hostname = "192.168.1.100"
+esxi_hostname = "192.168.1.121"
 esxi_hostport = 22
 esxi_hostssl  = "443"
 esxi_username = "root"
